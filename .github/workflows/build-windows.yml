@@ -21,6 +21,21 @@ jobs:
 
       - run: npm install
 
+      # Cria a tag da versão antes do electron-builder criar a Release.
+      - name: Criar tag da versão
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          $tag = "v$version"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if (-not (git ls-remote --tags origin "refs/tags/$tag")) {
+            git tag $tag
+            git push origin $tag
+          } else {
+            Write-Host "A tag $tag já existe."
+          }
+
       # Publica a versão do package.json no GitHub Release.
       # O electron-updater usa esse Release como fonte das atualizações.
       - run: npm run release:win
