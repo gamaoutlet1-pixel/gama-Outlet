@@ -39,13 +39,50 @@ jobs:
             git push origin $tag
           }
 
-      - name: Package and publish installer
+      - name: Package installer
         run: npm run release:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify installer files
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          $exe = "dist/Gama-Outlet-Setup-$version.exe"
+          if (-not (Test-Path $exe)) {
+            Write-Host "Arquivos em dist:"
+            Get-ChildItem dist | Select-Object Name, Length
+            throw "Instalador não encontrado: $exe"
+          }
+          if (-not (Test-Path "dist/latest.yml")) {
+            throw "latest.yml não encontrado. O auto-updater não poderá localizar atualizações."
+          }
+          Write-Host "Instalador encontrado: $exe"
+          Write-Host "latest.yml encontrado."
+
+      - name: Publish GitHub release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = node -p "require('./package.json').version"
+          $tag = "v$version"
+          $exe = "dist/Gama-Outlet-Setup-$version.exe"
+          $blockmap = "dist/Gama-Outlet-Setup-$version.exe.blockmap"
+          $latest = "dist/latest.yml"
+
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --title "Gama Outlet $version" --generate-notes --latest
+          }
+
+          gh release upload $tag $exe $blockmap $latest --repo $env:GITHUB_REPOSITORY --clobber
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: gama-outlet-windows
-          path: dist/*
+          path: |
+            dist/Gama-Outlet-Setup-*.exe
+            dist/Gama-Outlet-Setup-*.exe.blockmap
+            dist/latest.yml
