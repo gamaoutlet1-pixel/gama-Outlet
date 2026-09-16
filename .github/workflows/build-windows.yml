@@ -1,24 +1,33 @@
 name: Build Windows
+
 on:
   push:
     branches: [ main ]
-    tags: ['v*']
+    tags: ['v*.*.*']
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: windows-latest
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: npm install
-      - run: npm run build:win
+
+      # Publica a versão do package.json no GitHub Release.
+      # O electron-updater usa esse Release como fonte das atualizações.
+      - run: npm run release:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: gama-outlet-windows
-          path: dist/*.exe
+          path: dist/*
