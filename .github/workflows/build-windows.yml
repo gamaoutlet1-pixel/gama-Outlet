@@ -1,0 +1,51 @@
+name: Build Gama Outlet Windows
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web application
+        run: npm run build
+
+      - name: Create version tag
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          $tag = "v$version"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if (-not (git ls-remote --tags origin "refs/tags/$tag")) {
+            git tag $tag
+            git push origin $tag
+          }
+
+      - name: Package and publish installer
+        run: npm run release:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gama-outlet-windows
+          path: dist/*
