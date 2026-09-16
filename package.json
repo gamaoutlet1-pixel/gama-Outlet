@@ -1,12 +1,13 @@
 {
   "name": "gama-outlet",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Gama Outlet - sistema de gestão",
   "main": "main.js",
   "author": "Gama Outlet",
   "license": "UNLICENSED",
   "scripts": {
     "start": "electron .",
+    "build:win": "electron .",
     "build:win": "electron-builder --win nsis --x64 --publish never",
     "release:win": "electron-builder --win nsis --x64 --publish always"
   },
