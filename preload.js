@@ -32,7 +32,7 @@ function findColumn(headers, aliases) {
   return -1;
 }
 
-async function importSpreadsheet(file) {
+async function prepareSpreadsheet(file) {
   if (!file) return;
   const extension = String(file.name || '').toLowerCase().split('.').pop();
   if (!['xlsx', 'xls', 'csv'].includes(extension)) throw new Error('Formato não suportado.');
@@ -81,18 +81,25 @@ async function importSpreadsheet(file) {
 
   if (!imported.length) throw new Error('Nenhuma linha de produto válida foi encontrada.');
 
-  const key = 'gama_outlet_v2';
-  const db = JSON.parse(localStorage.getItem(key) || 'null') || { products: [], batches: [], moves: [], quotes: [] };
-  if (!Array.isArray(db.products)) db.products = [];
-  if (!Array.isArray(db.batches)) db.batches = [];
-  if (!Array.isArray(db.moves)) db.moves = [];
-  if (!Array.isArray(db.quotes)) db.quotes = [];
-  db.products.push(...imported);
-  localStorage.setItem(key, JSON.stringify(db));
-  window.location.reload();
+  localStorage.setItem('gama_outlet_pending_import', JSON.stringify({
+    fileName: file.name,
+    lot,
+    count: imported.length,
+    products: imported
+  }));
+
+  window.dispatchEvent(new CustomEvent('gama-spreadsheet-ready'));
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  const handleFile = file => {
+    if (!file) return;
+    prepareSpreadsheet(file).catch(error => {
+      console.error('[Gama Outlet] Falha ao ler planilha:', error);
+      window.alert(`Não foi possível ler a planilha.\n\n${error?.message || error}`);
+    });
+  };
+
   document.addEventListener('change', event => {
     const target = event.target;
     if (!target || target.id !== 'fileInput') return;
@@ -100,10 +107,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!file) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    importSpreadsheet(file).catch(error => {
-      console.error('[Gama Outlet] Falha ao importar planilha:', error);
-      window.alert(`Não foi possível importar a planilha.\n\n${error?.message || error}`);
-    });
+    handleFile(file);
   }, true);
 
   document.addEventListener('drop', event => {
@@ -113,9 +117,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!file) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    importSpreadsheet(file).catch(error => {
-      console.error('[Gama Outlet] Falha ao importar planilha:', error);
-      window.alert(`Não foi possível importar a planilha.\n\n${error?.message || error}`);
-    });
+    handleFile(file);
   }, true);
 });
