@@ -1,20 +1,45 @@
 {
   "name": "gama-outlet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Gama Outlet - sistema de gestão",
   "main": "main.js",
   "author": "Gama Outlet",
   "license": "UNLICENSED",
-  "scripts": {"start": "electron .", "build:win": "electron-builder --win nsis --x64"},
-  "devDependencies": {"electron": "^37.0.0", "electron-builder": "^26.0.0"},
-  "dependencies": {"xlsx": "^0.18.5"},
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win nsis --x64 --publish never",
+    "release:win": "electron-builder --win nsis --x64 --publish always"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2",
+    "xlsx": "^0.18.5"
+  },
   "build": {
     "appId": "br.com.gamaoutlet.gamaoutlet",
     "productName": "Gama Outlet",
     "directories": {"output": "dist"},
     "files": ["main.js", "preload.js", "index.html", "package.json"],
-    "win": {"target": [{"target": "nsis", "arch": ["x64"]}], "artifactName": "Gama-Outlet-Setup-${version}.${ext}"},
-    "nsis": {"oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "createStartMenuShortcut": true, "shortcutName": "Gama Outlet"},
-    "publish": [{"provider": "github", "owner": "gamaoutlet1-pixel", "repo": "gama-Outlet"}]
+    "win": {
+      "target": [{"target": "nsis", "arch": ["x64"]}],
+      "artifactName": "Gama-Outlet-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Gama Outlet"
+    },
+    "publish": [{
+      "provider": "github",
+      "owner": "gamaoutlet1-pixel",
+      "repo": "gama-Outlet",
+      "releaseType": "release"
+    }]
   }
 }
