@@ -3,7 +3,6 @@ name: Build Windows
 on:
   push:
     branches: [ main ]
-    tags: ['v*.*.*']
   workflow_dispatch:
 
 jobs:
@@ -36,8 +35,6 @@ jobs:
             Write-Host "A tag $tag já existe."
           }
 
-      # Publica a versão do package.json no GitHub Release.
-      # O electron-updater usa esse Release como fonte das atualizações.
       - run: npm run release:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
