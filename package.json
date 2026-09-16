@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "desktop:dev": "npm run build && electron electron/main.cjs",
     "build:desktop": "npm run build && electron-builder --win nsis --x64 --publish never",
-    "release:win": "npm run build && electron-builder --win nsis --x64 --publish always"
+    "release:win": "npm run build && electron-builder --win nsis --x64 --publish never"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
@@ -25,8 +25,8 @@
     "@radix-ui/react-collapsible": "^1.2.6",
     "@radix-ui/react-context-menu": "^2.2.15",
     "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-dropdown-menu": "^2.1.16",
-    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-hover-card": "^1.1.11",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-menubar": "^1.1.16",
     "@radix-ui/react-navigation-menu": "^1.2.14",
@@ -57,7 +57,6 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
-    "jsbarcode": "^3.12.3",
     "lucide-react": "^0.575.0",
     "nitro": "3.0.260603-beta",
     "node-forge": "^1.4.0",
